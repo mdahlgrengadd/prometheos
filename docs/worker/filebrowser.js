@@ -1,5 +1,5 @@
 // Built worker plugin: filebrowser
-// Generated on: 2025-05-22T02:45:43.770Z
+// Generated on: 2025-05-22T03:10:48.772Z
 
 // src/worker/plugins/filebrowser.ts
 var filebrowserWorker = {
