@@ -30,7 +30,8 @@ Demo: https://mdahlgrengadd.github.io/prometheos/?open=wordeditor
 - **Theming & Styling**
   Tailwind CSS–powered design with support for custom plugin styles.
 
-  * Automatically theme Shadcn UI components to match OS styles (e.g., Windows 7, macOS, BeOS) for a seamless desktop experience.
+  * Automatically theme Shadcn UI components to match OS styles (e.g., Windows 7, macOS, BeOS) for a unified look.
+  * **Responsive design** Desktop and apps respond to available screenspace and is "Smartphone friendly". 
 
 ---
 
