@@ -1,0 +1,1 @@
+import{j as i}from"./index-jlDGvy4N.js";import{J as r,K as o}from"./MacroContext-DmdtLhcP.js";const d={id:r.id,manifest:r,init:async()=>{console.log("Word Editor Pro plugin initialized")},render:()=>i.jsx("div",{className:"text-primary",children:i.jsx(o,{})})};export{d as default};
