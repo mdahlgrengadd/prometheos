@@ -1,1 +1,0 @@
-import{j as i}from"./index-BIFYmypJ.js";import{J as r,K as o}from"./MacroContext-CLnXWMhj.js";const d={id:r.id,manifest:r,init:async()=>{console.log("Word Editor Pro plugin initialized")},render:()=>i.jsx("div",{className:"text-primary",children:i.jsx(o,{})})};export{d as default};
