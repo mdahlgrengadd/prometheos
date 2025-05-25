@@ -1,5 +1,5 @@
 // Built worker plugin: webamp
-// Generated on: 2025-05-25T14:56:54.997Z
+// Generated on: 2025-05-25T17:08:05.470Z
 
 // src/worker/plugins/webamp.ts
 var webampWorker = {
