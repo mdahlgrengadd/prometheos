@@ -1,0 +1,1 @@
+import{j as i}from"./index-CpAo7Lf-.js";import{V as r,X as o}from"./MacroContext-C3L8apHs.js";import"./monaco-editor-Dq6WuQlL.js";const e={id:r.id,manifest:r,init:async()=>{console.log("Word Editor Pro plugin initialized")},render:()=>i.jsx("div",{className:"text-primary",children:i.jsx(o,{})})};export{e as default};

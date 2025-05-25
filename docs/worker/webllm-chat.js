@@ -1,5 +1,5 @@
 // Built worker plugin: webllm-chat
-// Generated on: 2025-05-24T17:56:27.760Z
+// Generated on: 2025-05-25T07:24:50.116Z
 
 // src/worker/plugins/webllm-chat.ts
 var webllmChatWorker = {
