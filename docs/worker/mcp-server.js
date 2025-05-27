@@ -1,5 +1,5 @@
 // Built worker plugin: mcp-server
-// Generated on: 2025-05-27T07:04:23.298Z
+// Generated on: 2025-05-27T11:41:05.194Z
 
 // src/worker/plugins/mcp-server.ts
 var MCPServerWorker = {
