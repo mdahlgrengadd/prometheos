@@ -1,5 +1,5 @@
 // Built worker plugin: pyodide
-// Generated on: 2025-05-26T19:48:12.948Z
+// Generated on: 2025-05-27T07:04:24.506Z
 
 // node_modules/comlink/dist/esm/comlink.mjs
 var proxyMarker = Symbol("Comlink.proxy");
