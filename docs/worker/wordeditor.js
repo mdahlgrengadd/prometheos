@@ -1,37 +1,4 @@
 // Built worker plugin: wordeditor
-// Generated on: 2025-05-27T11:41:09.778Z
+// Generated on: 2025-05-27T11:44:39.852Z
 
-// src/worker/plugins/wordeditor.ts
-var documentText = "";
-var wordeditorWorker = {
-  id: "wordeditor",
-  setText(text) {
-    documentText = typeof text === "string" ? text : "";
-    return { success: true };
-  },
-  getText() {
-    return { success: true, text: documentText };
-  },
-  /**
-   * Generic handler function that processes method calls with parameters
-   */
-  handle(method, params) {
-    switch (method) {
-      case "setText": {
-        if (!params || typeof params.text !== "string") {
-          return { error: "setText requires a 'text' parameter of type string" };
-        }
-        return this.setText(params.text);
-      }
-      case "getText": {
-        return this.getText();
-      }
-      default:
-        return { error: `Method ${method} not supported for wordeditor` };
-    }
-  }
-};
-var wordeditor_default = wordeditorWorker;
-export {
-  wordeditor_default as default
-};
+var r="",o={id:"wordeditor",setText(t){return r=typeof t=="string"?t:"",{success:!0}},getText(){return{success:!0,text:r}},handle(t,e){switch(t){case"setText":return!e||typeof e.text!="string"?{error:"setText requires a 'text' parameter of type string"}:this.setText(e.text);case"getText":return this.getText();default:return{error:`Method ${t} not supported for wordeditor`}}}},n=o;export{n as default};
