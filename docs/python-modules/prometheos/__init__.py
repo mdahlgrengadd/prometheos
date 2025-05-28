@@ -26,47 +26,34 @@ except ImportError:
 
 class DesktopBridge:
     """Desktop API bridge for Python/Pyodide environment"""
-
+    
     def __init__(self):
         self._desktop = None
-        # Don't check availability immediately - allow manual initialization
-        try:
-            self._check_desktop_availability()
-        except Exception:
-            # Initialization can fail, will be retried later
-            pass
-
+        self._check_desktop_availability()
+    
     def _check_desktop_availability(self):
         """Check if desktop API is available in the global scope"""
         try:
             # In Pyodide, we can access JavaScript globals through js module
             if hasattr(js, 'desktop') and hasattr(js.desktop, 'api'):
                 self._desktop = js.desktop
-                return True
             else:
-                self._desktop = None
-                return False
+                raise RuntimeError("Desktop API bridge not available")
         except Exception as e:
-            self._desktop = None
-            return False
-
+            raise RuntimeError(f"Failed to access desktop API: {e}")
+    
     async def execute(self, component_id: str, action_id: str, params: Optional[Dict[str, Any]] = None) -> Any:
         """Execute an API call through the desktop bridge"""
-        # Try to re-check desktop availability if not already available
-        if not self._desktop:
-            self._check_desktop_availability()
-
         if not self._desktop:
             raise RuntimeError("Desktop API bridge not available")
-
+        
         try:
             # Convert Python dict to JavaScript object if needed
-            js_params = js.Object.fromEntries(
-                params.items()) if params else js.undefined
-
+            js_params = js.Object.fromEntries(params.items()) if params else js.undefined
+            
             # Call the desktop API and await the result
             result = await self._desktop.api.execute(component_id, action_id, js_params)
-
+            
             # Convert JavaScript result back to Python if needed
             return result.to_py() if hasattr(result, 'to_py') else result
         except Exception as e:
@@ -77,128 +64,69 @@ class DesktopBridge:
 _desktop_client = DesktopBridge()
 
 
-class Launcher:
-    """Launcher API for managing applications"""
+class Services:
+    """Consolidated services API for app management, notifications, dialogs, and events"""
+    
+    @staticmethod
+    async def open(app_id: str) -> Any:
+        """Launch an app by its ID"""
+        return await _desktop_client.execute('services', 'open', {'appId': app_id})
 
     @staticmethod
-    async def launch_app(app_id: str) -> Any:
-        """Launch an application by ID"""
-        return await _desktop_client.execute('launcher', 'launchApp', {'appId': app_id})
+    async def kill(app_id: str) -> Any:
+        """Closes an app by its ID"""
+        return await _desktop_client.execute('services', 'kill', {'appId': app_id})
 
     @staticmethod
-    async def kill_app(app_id: str) -> Any:
-        """Kill an application by ID"""
-        return await _desktop_client.execute('launcher', 'killApp', {'appId': app_id})
+    async def restart(app_id: str) -> Any:
+        """Restarts an app by closing and reopening it"""
+        return await _desktop_client.execute('services', 'restart', {'appId': app_id})
 
     @staticmethod
-    async def notify(message: str, notification_type: str = 'radix') -> Any:
-        """Show a notification"""
-        return await _desktop_client.execute('launcher', 'notify', {
-            'message': message,
-            'type': notification_type
-        })
-
-
-class Dialog:
-    """Dialog API for user interactions"""
+    async def notify(message: str, type: str) -> Any:
+        """Show a notification on screen"""
+        return await _desktop_client.execute('services', 'notify', {'message': message, 'type': type})
 
     @staticmethod
-    async def open_dialog(
-        title: str,
-        description: Optional[str] = None,
-        confirm_label: Optional[str] = None,
-        cancel_label: Optional[str] = None
-    ) -> Any:
-        """Open a dialog box"""
-        params = {'title': title}
-        if description:
-            params['description'] = description
-        if confirm_label:
-            params['confirmLabel'] = confirm_label
-        if cancel_label:
-            params['cancelLabel'] = cancel_label
-
-        return await _desktop_client.execute('dialog', 'openDialog', params)
-
-
-class OnEvent:
-    """Event waiting API"""
+    async def open_dialog(title: str, description: str, confirm_label: str, cancel_label: str) -> Any:
+        """Opens a confirmation dialog and returns whether the user confirmed"""
+        return await _desktop_client.execute('services', 'openDialog', {'title': title, 'description': description, 'confirmLabel': confirm_label, 'cancelLabel': cancel_label})
 
     @staticmethod
-    async def wait_for_event(event_id: str, timeout: Optional[int] = None) -> Any:
-        """Wait for a specific event"""
-        params = {'eventId': event_id}
-        if timeout:
-            params['timeout'] = timeout
-
-        return await _desktop_client.execute('onEvent', 'waitForEvent', params)
-
-
-class Event:
-    """Event management API"""
+    async def wait_for_event(event_id: str, timeout: int) -> Any:
+        """Waits for the specified event to be emitted or until the timeout is reached"""
+        return await _desktop_client.execute('services', 'waitForEvent', {'eventId': event_id, 'timeout': timeout})
 
     @staticmethod
     async def list_events() -> Any:
-        """List all available events"""
-        return await _desktop_client.execute('event', 'listEvents', {})
+        """Returns all known event names"""
+        return await _desktop_client.execute('services', 'listEvents', {})
+
+    @staticmethod
+    async def emit_event(event_id: str, payload: str) -> Any:
+        """Emits a custom event with an optional payload"""
+        return await _desktop_client.execute('services', 'emitEvent', {'eventId': event_id, 'payload': payload})
 
 
 class Api:
     """Low-level API access"""
-
+    
     @staticmethod
     async def execute(component_id: str, action_id: str, params: Optional[Dict[str, Any]] = None) -> Any:
         """Execute a low-level API call"""
         return await _desktop_client.execute(component_id, action_id, params)
 
 
-# Global initialization functions
-def initialize(desktop_obj=None):
-    """Initialize the PrometheOS client with optional desktop object"""
-    global _desktop_client
-    try:
-        if desktop_obj:
-            # Manual initialization with provided desktop object
-            _desktop_client._desktop = desktop_obj
-            return True
-        else:
-            # Auto-initialization - try to detect desktop bridge
-            _desktop_client._check_desktop_availability()
-            return _desktop_client._desktop is not None
-    except Exception as e:
-        print(f"Initialization failed: {e}")
-        return False
-
-
-def is_available():
-    """Check if the PrometheOS client is available and ready to use"""
-    global _desktop_client
-    try:
-        return _desktop_client._desktop is not None
-    except Exception:
-        return False
-
-
 # Create instances for convenience
-launcher = Launcher()
-dialog = Dialog()
-on_event = OnEvent()
-event = Event()
+services = Services()
 api = Api()
 
 # Export everything
 __all__ = [
     'DesktopBridge',
-    'Launcher',
-    'Dialog',
-    'OnEvent',
-    'Event',
+    'Services',
     'Api',
-    'initialize',
-    'is_available',
-    'launcher',
-    'dialog',
-    'on_event',
-    'event',
+    # Instances
+    'services',
     'api'
 ]
